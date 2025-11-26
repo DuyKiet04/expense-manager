@@ -19,7 +19,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",                   // Cho phép máy tính của bạn
-  "https://TEN-TRANG-WEB-CUA-BAN.netlify.app" // 🔴 THAY LINK NETLIFY CỦA BẠN VÀO ĐÂY (KHÔNG CÓ DẤU / Ở CUỐI)
+  "https://quanlitask.netlify.app" // 🔴 THAY LINK NETLIFY CỦA BẠN VÀO ĐÂY (KHÔNG CÓ DẤU / Ở CUỐI)
 ];
 // Tạo Server Socket
 const server = http.createServer(app);
@@ -35,6 +35,8 @@ app.use(cors({
     credentials: true
 }
 ));
+app.options("*", cors());
+
 app.use(express.json());
 
 // 👇👇👇 ĐOẠN QUAN TRỌNG: GẮN SOCKET VÀO REQUEST 👇👇👇
