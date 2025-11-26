@@ -18,14 +18,13 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// 👇 DANH SÁCH CÁC TRANG ĐƯỢC PHÉP TRUY CẬP
+// 👇 DANH SÁCH CÁC TRANG ĐƯỢC PHÉP TRUY CẬP (Tuyệt đối không thêm dấu / ở cuối)
 const allowedOrigins = [
-  "http://localhost:5173",                   // Cho phép máy tính của bạn
-  "https://quanlitask.netlify.app",          // Link Netlify chính
-  "https://www.quanlitask.netlify.app"       // Link Netlify (dự phòng có www)
+  "http://localhost:5173",                   
+  "https://quanlitask.netlify.app"           
 ];
 
-// 1. Cấu hình Socket.io (Realtime)
+// 1. Cấu hình Socket.io
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -34,17 +33,24 @@ const io = new Server(server, {
   }
 });
 
-// 2. Cấu hình Express CORS (API)
+// 2. Cấu hình Express CORS (Sửa lại cách viết cho chuẩn nhất)
 app.use(cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Cho phép đủ các lệnh
+    origin: function (origin, callback) {
+        // Cho phép các request không có origin (như Postman, Mobile App) hoặc nằm trong list cho phép
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
 app.use(express.json());
 
-// 3. Gắn Socket vào request (Middleware quan trọng)
+// 3. Gắn Socket vào request
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -60,7 +66,6 @@ app.use('/api/savings', savingRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Test route để kiểm tra server sống hay chết
 app.get('/', (req, res) => {
   res.send('Server Expense Manager is RUNNING!');
 });
