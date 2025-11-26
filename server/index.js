@@ -17,7 +17,7 @@ const notificationRoutes = require('./routes/notificationRoutes')
 dotenv.config();
 const app = express();
 
-const web = 'https://quanlitask.netlify.app/';
+const web = 'https://quanlitask.netlify.app';
 // Tạo Server Socket
 const server = http.createServer(app);
 const io = new Server(server, {
