@@ -17,18 +17,21 @@ const notificationRoutes = require('./routes/notificationRoutes')
 dotenv.config();
 const app = express();
 
-const web = 'https://quanlitask.netlify.app';
+const allowedOrigins = [
+  "http://localhost:5173",                   // Cho phép máy tính của bạn
+  "https://TEN-TRANG-WEB-CUA-BAN.netlify.app" // 🔴 THAY LINK NETLIFY CỦA BẠN VÀO ĐÂY (KHÔNG CÓ DẤU / Ở CUỐI)
+];
 // Tạo Server Socket
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: web, // Link Frontend của bạn
+    origin:allowedOrigins , // Link Frontend của bạn
     methods: ["GET", "POST"]
   }
 });
 
 app.use(cors({
-  origin: web, // Cho phép Netlify gọi API
+  origin: allowedOrigins, // Cho phép Netlify gọi API
     credentials: true
 }
 ));
