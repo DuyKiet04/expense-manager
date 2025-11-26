@@ -17,16 +17,21 @@ const notificationRoutes = require('./routes/notificationRoutes')
 dotenv.config();
 const app = express();
 
+const web = 'https://quanlitask.netlify.app/';
 // Tạo Server Socket
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Link Frontend của bạn
+    origin: web, // Link Frontend của bạn
     methods: ["GET", "POST"]
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: web, // Cho phép Netlify gọi API
+    credentials: true
+}
+));
 app.use(express.json());
 
 // 👇👇👇 ĐOẠN QUAN TRỌNG: GẮN SOCKET VÀO REQUEST 👇👇👇
