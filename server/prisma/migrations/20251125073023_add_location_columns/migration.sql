@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Expense" ADD COLUMN     "address" TEXT,
+ADD COLUMN     "lat" DOUBLE PRECISION,
+ADD COLUMN     "lng" DOUBLE PRECISION;

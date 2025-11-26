@@ -1,0 +1,144 @@
+/* 1. IMPORTS & FONT */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* 2. BASE RESET & FULL HEIGHT (QUAN TRỌNG NHẤT CHO RESPONSIVE) */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Chuẩn hóa box model */
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Chống thanh cuộn ngang trên mobile */
+}
+
+.ant-col {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+/* 3. TRANSITIONS (FIX LỖI CHỚP/GIẬT KHI ĐỔI SÁNG/TỐI) */
+*, *::before, *::after {
+  transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+              border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+              color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+              box-shadow 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* 4. CÁC KIỂU THẺ MÀU (GRADIENT & SHADOW) */
+
+/* Card Style 1: Primary Gradient (Purple/Blue) */
+.gradient-card {
+  background: linear-gradient(135deg, #6C63FF 0%, #4834d4 100%);
+  color: white;
+  border: none;
+}
+.gradient-card .ant-statistic-title, 
+.gradient-card .ant-statistic-content-value,
+.gradient-card .anticon {
+  color: white !important;
+}
+
+/* Card Style 2: Task Gradient (Orange/Pink) */
+.gradient-card-task {
+  background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%);
+  color: white;
+  border: none;
+}
+.gradient-card-task .ant-statistic-title, 
+.gradient-card-task .ant-statistic-content-value,
+.gradient-card-task .anticon,
+.gradient-card-task .ant-progress-text {
+  color: white !important;
+}
+
+/* 5. FIX LỖI ẢNH VÀ MAP (Conflict với Ant Design) */
+
+/* Fix lỗi Marker và Tiles bị vỡ/lệch khi Ant Design áp dụng max-width: 100% */
+.leaflet-container img,
+.leaflet-container a,
+.leaflet-pane img, 
+.leaflet-tile, 
+.leaflet-marker-icon, 
+.leaflet-marker-shadow {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* 6. CUSTOM MARKER STYLING (Ghim bản đồ) */
+
+/* Marker hiển thị (Pin Shape) */
+.custom-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: #ff4d4f;
+  position: absolute;
+  transform: rotate(-45deg);
+  margin: -15px 0 0 -15px;
+  box-shadow: -3px 5px 5px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+}
+.custom-pin::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  margin: 6px 0 0 6px;
+  background: #fff;
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Dynamic Pin Colors */
+.pin-expense { background: #ff4d4f; }
+.pin-income { background: #52c41a; }
+.pin-saving { background: #faad14; }
+.pin-debt { background: #1890ff; }
+
+/* Pulse Marker (Selection) */
+.pulse-marker {
+  background: #1890ff;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  border: 3px solid #fff;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.pulse-marker::after {
+  content: "";
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  margin: -13px 0 0 -13px;
+  animation: pulsate 1.5s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 0;
+  box-shadow: 0 0 1px 2px #1890ff;
+  animation-delay: 0s;
+}
+
+@keyframes pulsate {
+  0% { transform: scale(0.1, 0.1); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(1.2, 1.2); opacity: 0; }
+}
+
+/* 7. SCROLLBAR & GHOST STYLES */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}

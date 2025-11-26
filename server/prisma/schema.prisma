@@ -1,0 +1,149 @@
+// 1. Cấu hình kết nối
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 2. Bảng Người dùng (Users)
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  fullName  String?
+  avatar    String?
+  role      Role      @default(USER) // Phân quyền: USER hoặc ADMIN
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Quan hệ ngược (User có nhiều khoản chi và task)
+  expenses  Expense[]
+  tasks     Task[]
+  notificationReads NotificationRead[]
+  resetToken       String?   // Lưu mã OTP
+  resetTokenExpiry DateTime? // Lưu thời gian hết hạn của mã
+  savingGoals SavingGoal[]
+}
+
+// Enum để phân quyền cứng (Tránh gõ sai)
+enum Role {
+  USER
+  ADMIN
+}
+
+// 3. Bảng Danh mục chi tiêu (Categories)
+// Admin sẽ tạo sẵn các mục này (Ăn uống, đi lại...)
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  icon      String?   // Lưu tên icon hoặc link ảnh
+  type      CategoryType // INCOME (Thu) hoặc EXPENSE (Chi)
+  
+  expenses  Expense[]
+}
+
+enum CategoryType {
+  EXPENSE       // Chi tiêu
+  INCOME        // Thu nhập
+  DEBT_LENT     // Cho vay (Tiền đi ra nhưng là tài sản)
+  DEBT_BORROWED // Đi vay (Tiền đi vào nhưng là nợ)
+  SAVING        // Tiết kiệm
+}
+
+// 2. Cập nhật bảng Expense (Thực chất giờ là bảng Giao Dịch - Transaction)
+model Expense {
+  id          Int      @id @default(autoincrement())
+  amount      Decimal  @db.Decimal(15, 2) // Tăng giới hạn số tiền
+  note        String?
+  date        DateTime @default(now())
+  imageUrl    String?
+  
+  // 👇 THÊM TRƯỜNG NÀY: Đánh dấu chi cho gia đình
+  isFamily    Boolean  @default(false) 
+
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  lat         Float?   // Vĩ độ
+  lng         Float?   // Kinh độ
+  address     String?  // Địa chỉ (tùy chọn, lưu tên quán)
+}
+
+// 5. Bảng Công việc (Tasks)
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  deadline    DateTime?
+  priority    Priority @default(MEDIUM)
+  status      Status   @default(TODO)
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Status {
+  TODO
+  DOING
+  DONE
+}
+
+// 6. Bảng Mẫu công việc (Task Templates - Admin tạo)
+// Ví dụ: Template "Học tập" có priority mặc định là HIGH
+model TaskTemplate {
+  id              Int      @id @default(autoincrement())
+  name            String   // Ví dụ: "Học tập", "Việc nhà"
+  defaultPriority Priority @default(MEDIUM)
+}
+
+// 7. Bảng Thông báo (Notifications)
+model Notification {
+  id        Int      @id @default(autoincrement())
+  title     String
+  message   String
+  type      String   @default("INFO")
+  isGlobal  Boolean  @default(false) // True: Admin gửi toàn hệ thống
+  createdAt DateTime @default(now())
+  mediaUrl  String?  // Link ảnh hoặc video
+  mediaType String?  // 'IMAGE' hoặc 'VIDEO'
+
+  isPopup   Boolean  @default(false)
+  reads     NotificationRead[]
+  // Nếu là thông báo cá nhân thì cần userId, nếu global thì null
+  userId    Int?
+}
+model SavingGoal {
+  id            Int      @id @default(autoincrement())
+  name          String   // Tên: Mua xe, Mua laptop...
+  targetAmount  Decimal  @db.Decimal(15, 2) // Mục tiêu: 30 triệu
+  currentAmount Decimal  @db.Decimal(15, 2) @default(0) // Đã có: 5 triệu
+  deadline      DateTime? // Hạn chót (Optional)
+  
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model NotificationRead {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  notifId   Int
+  readAt    DateTime @default(now())
+
+  user          User         @relation(fields: [userId], references: [id])
+  notification  Notification @relation(fields: [notifId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notifId]) // Một người chỉ đọc 1 tin 1 lần
+}
